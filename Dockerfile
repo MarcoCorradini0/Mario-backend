@@ -19,4 +19,4 @@ ENV QUARKUS_PROFILE=prod
 EXPOSE 8080
 
 # Avvia Quarkus con profilo prod
-CMD ["java", "-jar", "quarkus-run.jar", "-Dquarkus.profile=prod"]
+CMD ["sh", "-c", "java -jar quarkus-run.jar -Dquarkus.profile=${QUARKUS_PROFILE} -Dquarkus.http.port=${PORT}"]
