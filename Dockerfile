@@ -1,13 +1,22 @@
-# Stage 1: build
+# ===== BUILD STAGE =====
 FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: run
-FROM eclipse-temurin:21-jdk-jammy
+# ===== RUN STAGE =====
+FROM eclipse-temurin:21-jre
 WORKDIR /app
+
+# Copia l'app già buildata
 COPY --from=build /app/target/quarkus-app /app
+
+# Profile Quarkus: prod
+ENV QUARKUS_PROFILE=prod
+
+# Espone porta 8080
 EXPOSE 8080
-CMD ["java", "-jar", "quarkus-run.jar"]
+
+# Avvia Quarkus con profilo prod
+CMD ["java", "-jar", "quarkus-run.jar", "-Dquarkus.profile=prod"]
