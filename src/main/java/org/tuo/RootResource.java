@@ -5,11 +5,19 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/ping")
-public class PingResource {
+@Path("/")
+public class RootResource {
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String ping(){
+    public String home() {
+        return "Ciao, sto funzionando";
+    }
+
+    @GET
+    @Path("/ping")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String ping() {
         return "pong";
     }
 }
