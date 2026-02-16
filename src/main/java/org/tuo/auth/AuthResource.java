@@ -2,7 +2,6 @@ package org.tuo.auth;
 
 import org.tuo.dto.RegisterRequestDTO;
 import org.tuo.player.Player;
-import org.tuo.player.PlayerResponse;
 
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -41,6 +40,14 @@ public class AuthResource {
                 .build();
         }
     }
+
+    @POST
+    @Path("/login")
+    public Response login(@Valid AuthRequestDTO dto){
+        AuthResponseDTO response = authService.login(dto);
+        return Response.ok(response).build();
+    }
+
     //DTO risposta
     public static class PlayerResponse{
         public final Long id;
@@ -55,6 +62,9 @@ public class AuthResource {
     }
     //DTO errori
     public static class ErrorResponse {
-                
+        public final String error;
+        public ErrorResponse(String error){
+            this.error=error;
+        }
     }
 }
