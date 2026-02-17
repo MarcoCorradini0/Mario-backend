@@ -21,11 +21,12 @@ public class GameSession {
     @ManyToOne
     @JoinColumn(name="player_id", nullable = false)
     public Player player;
-
+    public String playerUsername;
     public Integer score;
     public Integer levelReached;
     public Integer durationSeconds;
     public boolean validated;
     public Instant startedAt;
     public Instant endedAt;
+    public String status;
 }

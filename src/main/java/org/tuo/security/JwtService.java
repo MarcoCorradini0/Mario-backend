@@ -10,13 +10,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class JwtService {
-
-    // Passiamo direttamente il Player
     public String generateToken(Player player) {
         return Jwt.issuer("tuo-app")
                   .subject(player.username)
-                  .groups(Set.of(player.role.name())) // groups, non group
-                  .expiresIn(Duration.ofHours(24))    // correggi expireIn → expiresIn
+                  .groups(Set.of(player.role.name())) 
+                  .expiresIn(Duration.ofHours(24))    
                   .sign();
     }
 }

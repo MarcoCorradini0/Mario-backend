@@ -24,17 +24,19 @@ CREATE INDEX idx_players_email on players(email);
 CREATE TABLE game_sessions(
     id BIGSERIAL PRIMARY KEY,
     player_id BIGINT NOT NULL,
+    player_username VARCHAR(255),
     score INTEGER NOT NULL,
     level_reached INTEGER NOT NULL,
     duration_seconds INTEGER NOT NULL,
     validated BOOLEAN NOT NULL DEFAULT FALSE,
     started_at TIMESTAMP NOT NULL,
-    ended_at TIMESTAMP NOT NULL,
+    ended_at TIMESTAMP,
     CONSTRAINT fk_player
         FOREIGN KEY(player_id)
-        REFERENCES player(id)
+        REFERENCES players(id)
         ON DELETE CASCADE
 );
 CREATE INDEX idx_game_sessions_player_id ON game_sessions(player_id);
 CREATE INDEX idx_game_sessions_score ON game_sessions(score DESC);
 CREATE INDEX idx_game_sessions_created_at ON game_sessions(started_at);
+
