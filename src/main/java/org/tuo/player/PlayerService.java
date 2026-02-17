@@ -1,5 +1,7 @@
 package org.tuo.player;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -17,5 +19,16 @@ public class PlayerService {
         if (score>player.bestScore) {
             player.bestScore=score;
         }
+    }
+    public void changePassword(Long playerId, String oldPassword, String newPassword){
+        Player player=playerRepo.findByIdOptional(playerId)
+                                .orElseThrow(()->new IllegalArgumentException("Player not found"));
+        //Controllo pw attuale
+        if (!BCrypt.checkpw(oldPassword, player.passwordHash)) {
+            throw new IllegalArgumentException("Old password incorrect");
+        }
+        //Hash
+        String hashed=BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
+        player.passwordHash=hashed;
     }
 }

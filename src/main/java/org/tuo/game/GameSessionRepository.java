@@ -16,4 +16,8 @@ public class GameSessionRepository implements PanacheRepository<GameSession> {
                 .page(0, limit)              
                 .list();                     
     }
+    public List<GameSession> listAllSortedByScore() {
+        return findAll(Sort.by("score").descending()).list();
+    }
+
 }

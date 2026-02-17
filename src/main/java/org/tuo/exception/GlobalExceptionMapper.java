@@ -3,6 +3,9 @@ package org.tuo.exception;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+
+import org.hibernate.annotations.NotFound;
+
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotAllowedException;
@@ -20,7 +23,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable exception) {
         if (exception instanceof IllegalArgumentException) {
-            return Response.status(Response.Status.BAD_REQUEST) // 400
+            return Response.status(Response.Status.BAD_REQUEST)  // 400
                     .entity(new ErrorResponse(exception.getMessage()))
                     .build();
         } else if (exception instanceof NotAuthorizedException) {
@@ -29,6 +32,10 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                     .build();
         } else if (exception instanceof ForbiddenException) {
             return Response.status(Response.Status.FORBIDDEN)    // 403
+                    .entity(new ErrorResponse(exception.getMessage()))
+                    .build();
+        } else if (exception instanceof NotFound) {
+            return Response.status(Response.Status.NOT_FOUND)    // 404
                     .entity(new ErrorResponse(exception.getMessage()))
                     .build();
         } else if (exception instanceof NotAllowedException) {   // 405
