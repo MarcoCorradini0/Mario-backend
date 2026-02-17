@@ -1,4 +1,7 @@
-target/
-.git
-.gitignore
-README.md
+# Target build
+/target/
+# Git itself
+/.git
+# Keys
+/src/main/resources/keys/privateKey.pem
+/src/main/resources/keys/publicKey.pem
