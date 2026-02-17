@@ -15,10 +15,6 @@ import org.tuo.dto.GameSessionDTO;
 import org.tuo.dto.PlayerLeaderboardResponse;
 import org.tuo.game.GameSessionMapper;
 
-import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
-
-import io.vertx.codegen.annotations.GenIgnore;
-
 @Path("/leaderboard")
 @Produces(MediaType.APPLICATION_JSON)
 public class LeaderboardResource {
