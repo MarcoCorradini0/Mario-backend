@@ -3,4 +3,5 @@
 # Git itself
 /.git
 # Key private
-src\main\resources\keys\privateKey.pem
+src\main\resources\key\privateKey.pem
+target/classes/key/
