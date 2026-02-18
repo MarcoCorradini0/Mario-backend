@@ -1,4 +1,4 @@
-target/
-.git
-.gitignore
-README.md
+# Target build
+/target/
+# Git itself
+/.git
