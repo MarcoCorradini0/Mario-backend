@@ -1,6 +1,5 @@
 package org.tuo.auth;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -10,7 +9,6 @@ import org.tuo.player.Player;
 import org.tuo.player.PlayerRepository;
 import org.tuo.security.JwtService;
 
-import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
