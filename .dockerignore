@@ -3,6 +3,8 @@
 # Git itself
 /.git
 # Keys
-*.pem
+src\main\resources\keys\privateKey.pem
 *.key
+*.pem
+# Properties
 application.properties
