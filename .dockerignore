@@ -2,9 +2,5 @@
 /target/
 # Git itself
 /.git
-# Keys
+# Key private
 src\main\resources\keys\privateKey.pem
-*.key
-*.pem
-# Properties
-application.properties
