@@ -27,22 +27,21 @@ public class GameResource {
     @GET
     @Path("/start")
     @RolesAllowed("USER")
-    public GameSessionDTO startGame(){
-        String username=jwt.getSubject();
-        GameSession session=gameSessionService.startNewSession(username);
+    public GameSessionDTO startGame() {
+        String username = jwt.getSubject();
+        GameSession session = gameSessionService.startNewSession(username);
         return GameSessionMapper.toDTO(session);
     }
 
     @POST
-    @Path("/end")
+    @Path("/end/{id}")
     @RolesAllowed("USER")
-    public GameSessionDTO endGame(@PathParam("id")Long id, EndGameRequestDTO request){
-        GameSession session=gameSessionService.endSession(
-            id,
-            request.score,
-            request.levelReached,
-            request.durationSeconds
-        );
+    public GameSessionDTO endGame(@PathParam("id") Long id, EndGameRequestDTO request) {
+        GameSession session = gameSessionService.endSession(
+                id,
+                request.score,
+                request.levelReached,
+                request.durationSeconds);
         return GameSessionMapper.toDTO(session);
     }
 }
