@@ -1,20 +1,16 @@
-name: Build Native Binary
+name: Build Native Binary & Release
 
 on:
   push:
     branches:
       - main
 
-concurrency:
-  group: native-build-main
-  cancel-in-progress: true
+permissions:
+  contents: write
 
 jobs:
   build-native:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # necessario per pushare sul repo
 
     steps:
       - name: Checkout repository
@@ -27,30 +23,28 @@ jobs:
           distribution: 'graalvm'
           native-image: 'true'
 
-      - name: Cache Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            m2-${{ runner.os }}-
-
-      - name: Make mvnw executable (just in case)
+      - name: Make mvnw executable
         run: chmod +x mvnw
 
       - name: Build native executable
         run: ./mvnw -Pnative clean package -DskipTests
 
-      - name: Upload native binary to repo
-        run: |
-          mkdir -p native-binaries/latest
-          cp target/*-runner native-binaries/latest/app
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git add native-binaries/latest/app
-          if git diff --staged --quiet; then
-            echo "No changes in native binary, skipping commit."
-          else
-            git commit -m "Update native binary"
-            git push
-          fi
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: native-latest
+          name: Latest Native Build
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload app binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: native-latest
+          files: ./target/*-runner
+          name: app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
