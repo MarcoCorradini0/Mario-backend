@@ -1,22 +1,6 @@
-# ===== BUILD STAGE =====
-FROM maven:3.9.4-eclipse-temurin-21 AS build
+FROM gcr.io/distroless/static
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# ===== RUN STAGE =====
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-
-# Copia l'app già buildata
-COPY --from=build /app/target/quarkus-app /app
-
-# Profile Quarkus: prod
-ENV QUARKUS_PROFILE=prod
-
-# Espone porta 8080
+ADD https://raw.githubusercontent.com/MarcoCorradini0/Mario-backend/main/native-binaries/latest/app /app/app
+RUN chmod +x /app/app
 EXPOSE 8080
-
-# Avvia Quarkus con profilo prod
-CMD ["sh", "-c", "java -jar quarkus-run.jar -Dquarkus.profile=${QUARKUS_PROFILE} -Dquarkus.http.port=${PORT}"]
+ENTRYPOINT ["/app/app", "-Dquarkus.http.host=0.0.0.0", "-Dquarkus.http.port=${PORT}"]

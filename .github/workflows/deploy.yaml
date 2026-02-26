@@ -1,0 +1,56 @@
+name: Build Native Binary
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: native-build-main
+  cancel-in-progress: true
+
+jobs:
+  build-native:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # necessario per pushare sul repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          native-image: 'true'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      - name: Make mvnw executable (just in case)
+        run: chmod +x mvnw
+
+      - name: Build native executable
+        run: ./mvnw -Pnative clean package -DskipTests
+
+      - name: Upload native binary to repo
+        run: |
+          mkdir -p native-binaries/latest
+          cp target/*-runner native-binaries/latest/app
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add native-binaries/latest/app
+          if git diff --staged --quiet; then
+            echo "No changes in native binary, skipping commit."
+          else
+            git commit -m "Update native binary"
+            git push
+          fi
