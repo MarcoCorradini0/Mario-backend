@@ -21,7 +21,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'graalvm'
-          components: 'native-image'
 
       - name: Make mvnw executable
         run: chmod +x mvnw
@@ -44,6 +43,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
-          files: ./target/*-runner#app
+          files: ./target/backend-1.0.0-SNAPSHOT-runner#app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
