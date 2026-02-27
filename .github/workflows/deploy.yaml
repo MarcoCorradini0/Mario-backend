@@ -21,7 +21,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'graalvm'
-          components: 'native-image'
 
       - name: Make mvnw executable
         run: chmod +x mvnw
@@ -30,11 +29,11 @@ jobs:
         run: ./mvnw -Pnative clean package -DskipTests
 
       - name: Show target folder
-        run: ls -lah ./target && ls -lah ./target/* || true
+        run: ls -lah ./target || true
 
-      # Trova dinamicamente il binario *-runner e lo espone come output
       - name: Find native runner
         id: find_runner
+        shell: bash
         run: |
           set -e
           FILE=$(ls -1 target/*-runner 2>/dev/null | head -n 1 || true)
@@ -42,11 +41,18 @@ jobs:
             echo "Runner non trovato in target/*-runner"
             exit 1
           fi
-          echo "runner_path=$FILE" >> $GITHUB_OUTPUT
           echo "Found runner: $FILE"
+          echo "runner_path=$FILE" >> $GITHUB_OUTPUT
 
+      # Rinominiamo esplicitamente il file in 'app'
+      - name: Prepare release asset
+        run: |
+          cp "${{ steps.find_runner.outputs.runner_path }}" app
+          chmod +x app
+          ls -lah app
+
+      # Crea/aggiorna la release con tag fisso
       - name: Create/Update release (tag native-latest)
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
@@ -56,10 +62,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload app binary to release (renamed to 'app')
+      # Carica 'app' come asset; con overwrite per evitare duplicati
+      - name: Upload 'app' asset to release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
-          files: ${{ steps.find_runner.outputs.runner_path }}#app
+          files: app
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
