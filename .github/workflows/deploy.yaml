@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'graalvm'
-          native-image: 'true'
+          components: 'native-image'
 
       - name: Make mvnw executable
         run: chmod +x mvnw
