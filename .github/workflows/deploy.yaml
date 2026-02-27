@@ -44,7 +44,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
-          files: ./target/*-runner
-          name: app
+          files: ./target/*-runner#app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
