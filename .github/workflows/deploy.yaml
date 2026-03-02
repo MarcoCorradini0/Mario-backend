@@ -1,4 +1,4 @@
-name: Build Native Binary & Release (TURBO)
+name: Build Native Binary & Release
 
 on:
   push:
@@ -49,9 +49,7 @@ jobs:
       # - GC: G1
       # ----------------------------
       - name: Build native executable (Turbo)
-        run: ./mvnw -Pnative clean package \
-             -DskipTests \
-             -Dquarkus.native.additional-build-args="--gc=G1,-Ob"
+        run: ./mvnw -Pnative clean package -DskipTests -Dquarkus.native.additional-build-args="--gc=G1,-Ob"
 
       # ----------------------------
       # 5) Debug target
