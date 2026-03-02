@@ -1,4 +1,4 @@
-name: Build Native Binary & Release
+name: Build Native Binary & Release (TURBO)
 
 on:
   push:
@@ -13,10 +13,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ----------------------------
+      # 1) Checkout
+      # ----------------------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up GraalVM
+      # ----------------------------
+      # 2) Maven cache
+      # ----------------------------
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      # ----------------------------
+      # 3) Setup GraalVM 21
+      # (native-image incluso, niente "components")
+      # ----------------------------
+      - name: Set up GraalVM 21
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: '21'
@@ -25,17 +43,29 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x mvnw
 
-      - name: Build native executable
-        run: ./mvnw -Pnative clean package -DskipTests
+      # ----------------------------
+      # 4) Build Native TURBO
+      # - Quick Build Mode (-Ob)
+      # - GC: G1
+      # ----------------------------
+      - name: Build native executable (Turbo)
+        run: ./mvnw -Pnative clean package \
+             -DskipTests \
+             -Dquarkus.native.additional-build-args="--gc=G1,-Ob"
 
-      - name: Show target folder
-        run: ls -lah ./target || true
+      # ----------------------------
+      # 5) Debug target
+      # ----------------------------
+      # - name: Show target folder
+      #   run: ls -lah ./target || true
 
+      # ----------------------------
+      # 6) Trova il binario *-runner
+      # ----------------------------
       - name: Find native runner
         id: find_runner
         shell: bash
         run: |
-          set -e
           FILE=$(ls -1 target/*-runner 2>/dev/null | head -n 1 || true)
           if [ -z "$FILE" ]; then
             echo "Runner non trovato in target/*-runner"
@@ -44,26 +74,31 @@ jobs:
           echo "Found runner: $FILE"
           echo "runner_path=$FILE" >> $GITHUB_OUTPUT
 
-      # Rinominiamo esplicitamente il file in 'app'
+      # ----------------------------
+      # 7) Rinomina il binary → "app"
+      # ----------------------------
       - name: Prepare release asset
         run: |
           cp "${{ steps.find_runner.outputs.runner_path }}" app
           chmod +x app
-          ls -lah app
 
-      # Crea/aggiorna la release con tag fisso
-      - name: Create/Update release (tag native-latest)
+      # ----------------------------
+      # 8) Crea release senza warning
+      # ----------------------------
+      - name: Create/Update release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
-          name: Latest Native Build
           draft: false
           prerelease: false
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Carica 'app' come asset; con overwrite per evitare duplicati
-      - name: Upload 'app' asset to release
+      # ----------------------------
+      # 9) Carica asset "app" nella Release
+      # ----------------------------
+      - name: Upload native 'app' asset
         uses: softprops/action-gh-release@v1
         with:
           tag_name: native-latest
