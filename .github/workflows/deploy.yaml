@@ -68,6 +68,5 @@ jobs:
         with:
           tag_name: native-latest
           files: app
-          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
