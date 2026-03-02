@@ -32,7 +32,7 @@ jobs:
 
       # ----------------------------
       # 3) Setup GraalVM 21
-      # (native-image incluso, niente "components")
+      # (native-image)
       # ----------------------------
       - name: Set up GraalVM 21
         uses: graalvm/setup-graalvm@v1
@@ -44,21 +44,15 @@ jobs:
         run: chmod +x mvnw
 
       # ----------------------------
-      # 4) Build Native TURBO
+      # 4) Build Native executable
       # - Quick Build Mode (-Ob)
       # - GC: G1
       # ----------------------------
-      - name: Build native executable (Turbo)
+      - name: Build native executable
         run: ./mvnw -Pnative clean package -DskipTests -Dquarkus.native.additional-build-args="--gc=G1,-Ob"
 
       # ----------------------------
-      # 5) Debug target
-      # ----------------------------
-      # - name: Show target folder
-      #   run: ls -lah ./target || true
-
-      # ----------------------------
-      # 6) Trova il binario *-runner
+      # 5) Trova il binario *-runner
       # ----------------------------
       - name: Find native runner
         id: find_runner
@@ -73,7 +67,7 @@ jobs:
           echo "runner_path=$FILE" >> $GITHUB_OUTPUT
 
       # ----------------------------
-      # 7) Rinomina il binary → "app"
+      # 6) Rinomina il binary → "app"
       # ----------------------------
       - name: Prepare release asset
         run: |
@@ -81,7 +75,7 @@ jobs:
           chmod +x app
 
       # ----------------------------
-      # 8) Crea release senza warning
+      # 7) Crea release senza warning
       # ----------------------------
       - name: Create/Update release
         uses: softprops/action-gh-release@v1
@@ -94,7 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ----------------------------
-      # 9) Carica asset "app" nella Release
+      # 8) Carica asset "app" nella Release
       # ----------------------------
       - name: Upload native 'app' asset
         uses: softprops/action-gh-release@v1
