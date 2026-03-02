@@ -2,12 +2,10 @@
     FROM alpine:3.19 AS fetch
     WORKDIR /tmp
     RUN apk add --no-cache curl
-    # URL dell'asset 'app' dalla Release 'native-latest'
     ARG APP_URL=https://github.com/MarcoCorradini0/Mario-backend/releases/latest/download/app
     RUN curl -fL "$APP_URL" -o app && chmod +x app
-    
-# ---------- STAGE 2: runtime distroless static ----------
-    FROM gcr.io/distroless/static
+# ---------- STAGE 2: runtime distroless con glibc ----------
+    FROM gcr.io/distroless/cc-debian12
     WORKDIR /app
     COPY --from=fetch /tmp/app /app/app
     EXPOSE 8080
